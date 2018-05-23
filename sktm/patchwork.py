@@ -12,6 +12,7 @@
 # along with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import print_function
 import datetime
 import dateutil.parser
 import email
@@ -862,11 +863,9 @@ class skt_patchwork(object):
             pid:    The ID of the patch to dump.
         """
         patch = self.get_patch_by_id(pid)
-        print "pinfo=%s\n" % patch
-        print "message_id=%s\nemails=%s\n" % (
-            self.get_header_value(pid, 'Message-ID'),
-            self.get_emails(pid)
-        )
+        print("pinfo=", patch, sep='')
+        print("message_id=", self.get_header_value(pid, 'Message-ID'), sep='')
+        print("email=", self.get_emails(pid), sep='')
 
     # TODO Move this to __init__ or make it a class method
     def get_projectid(self, projectname):

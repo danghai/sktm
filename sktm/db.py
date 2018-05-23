@@ -12,6 +12,7 @@
 # along with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+from __future__ import print_function
 import logging
 import os
 import sqlite3
@@ -455,23 +456,21 @@ class skt_db(object):
                          'baseline.testrun_id = testrun.id')
 
         for (burl, commit, res, buildid) in self.cur.fetchall():
-            print "repo url: %s" % burl
-            print "commit id: %s" % commit
-            print "result: %s" % sktm.tresult(res).name
-            print "build id: #%s" % buildid
-            print "---"
+            print("repo url:", burl)
+            print("commit id:", commit)
+            print("result:", sktm.tresult(res).name)
+            print("build id: #", buildid, sep='')
+            print("---")
 
     def dump_baserepo_info(self):
         self.cur.execute('SELECT url FROM baserepo')
 
         for (burl,) in self.cur.fetchall():
-            print "repo url: %s" % burl
+            print("repo url:", burl)
             stable = self.get_stable(burl)
             latest = self.get_latest(burl)
-            print "most recent stable commit: %s (%s)" % (
-                stable, self.get_commitdate(burl, stable)
-            )
-            print "most recent tested commit: %s (%s)" % (
-                latest, self.get_commitdate(burl, latest)
-            )
-            print "---"
+            print("most recent stable commit: {} ({})".format(
+                  stable, self.get_commitdate(burl, stable)))
+            print("most recent stable commit: {} ({})".format(
+                  latest, self.get_commitdate(burl, latest)))
+            print("---")
