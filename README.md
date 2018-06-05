@@ -1,6 +1,9 @@
 sktm - skt manager
 ==================
 
+[![Travis CI Build Status][travis_badge]][travis_page]
+[![Test Coverage Status][coveralls_badge]][coveralls_page]
+
 sktm is an orchestrator for skt keeping track of known baselines and tested
 patches.
 
@@ -366,3 +369,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+[travis_badge]: https://travis-ci.org/RH-FMK/sktm.svg?branch=master
+[travis_page]: https://travis-ci.org/RH-FMK/sktm
+[coveralls_badge]: https://coveralls.io/repos/github/RH-FMK/sktm/badge.svg?branch=master
+[coveralls_page]: https://coveralls.io/github/RH-FMK/sktm?branch=master
