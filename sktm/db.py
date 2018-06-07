@@ -249,7 +249,7 @@ class skt_db(object):
 
         return result[0]
 
-    def get_expired_pending_patches(self, baseurl, projid, exptime=86400):
+    def get_expired_pending_patches(self, baseurl, project_id, exptime=86400):
         """
         Get a list of IDs of patches set as pending for longer than the
         specified time, for a combination of a Patchwork base URL and
@@ -258,7 +258,7 @@ class skt_db(object):
         Args:
             baseurl:    Base URL of Patchwork instance the project and patches
                         belong to.
-            projid:     ID of the Patchwork project the patches belong to.
+            project_id: ID of the Patchwork project the patches belong to.
             exptime:    The longer-than time the returned patches should have
                         been staying in the "pending" list.
                         Default is anything longer than 24 hours.
@@ -267,7 +267,7 @@ class skt_db(object):
             List of patch IDs.
         """
         patchlist = list()
-        sourceid = self.get_sourceid(baseurl, projid)
+        sourceid = self.get_sourceid(baseurl, project_id)
         tstamp = int(time.time()) - exptime
 
         self.cur.execute('SELECT id FROM pendingpatches WHERE '
@@ -279,7 +279,7 @@ class skt_db(object):
 
         if len(patchlist):
             logging.info("expired pending patches for %s (%d): %s", baseurl,
-                         projid, patchlist)
+                         project_id, patchlist)
 
         return patchlist
 
@@ -414,13 +414,13 @@ class skt_db(object):
         Args:
             baseurl:    Base URL of the Patchwork instance the project ID and
                         patch IDs belong to.
-            poject_id:  ID of the Patchwork project the patch IDs belong to.
+            project_id: ID of the Patchwork project the patch IDs belong to.
             patchset:   List of info tuples for patches to add to the list,
                         where each tuple contains the patch ID and a free-form
                         patch date string.
 
         """
-        patchset_id = self.get_sourceid(baseurl, project_id)
+        sourceid = self.get_sourceid(baseurl, project_id)
         tstamp = int(time.time())
 
         logging.debug("setting patches as pending: %s", patchset)
@@ -428,7 +428,7 @@ class skt_db(object):
                              'pendingpatches(id, pdate, patchsource_id, '
                              'timestamp) '
                              'VALUES(?, ?, ?, ?)',
-                             [(patch_id, patch_date, patchset_id, tstamp) for
+                             [(patch_id, patch_date, sourceid, tstamp) for
                               (patch_id, patch_date) in patchset])
         self.conn.commit()
 
