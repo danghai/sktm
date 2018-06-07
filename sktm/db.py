@@ -20,7 +20,7 @@ import time
 import sktm
 
 
-class skt_db(object):
+class SktDb(object):
     def __init__(self, db):
         if not os.path.isfile(db):
             self.createdb(db)

@@ -20,7 +20,7 @@ import unittest
 
 import mock
 
-from sktm.db import skt_db
+from sktm.db import SktDb
 
 
 class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
@@ -36,18 +36,18 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         shutil.rmtree(self.database_dir)
 
     def test_db_create_already_exists(self):
-        """Ensure skt_db() creates a database file when it doesn't exist."""
+        """Ensure SktDb() creates a database file when it doesn't exist."""
         sqlite3.connect(self.database_file)
-        skt_db(self.database_file)
+        SktDb(self.database_file)
 
         self.assertTrue(os.path.isfile(self.database_file))
 
     @mock.patch('logging.debug')
-    @mock.patch('sktm.db.skt_db.get_sourceid')
+    @mock.patch('sktm.db.SktDb.get_sourceid')
     @mock.patch('sktm.db.sqlite3')
     def test_commit_patch(self, mock_sql, mock_get_sourceid, mock_log):
         """Ensure commit_patch() creates/updates a patch record."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_sourceid.return_value = '1'
         testdb.commit_patch('1', '2', '3', '4', '5', '6', '7')
 
@@ -64,11 +64,11 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         # Ensure the data was committed to the database
         mock_sql.connect().commit.assert_called()
 
-    @mock.patch('sktm.db.skt_db.unset_patchset_pending')
-    @mock.patch('sktm.db.skt_db.commit_series')
-    @mock.patch('sktm.db.skt_db.get_baselineid')
-    @mock.patch('sktm.db.skt_db.commit_testrun')
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.unset_patchset_pending')
+    @mock.patch('sktm.db.SktDb.commit_series')
+    @mock.patch('sktm.db.SktDb.get_baselineid')
+    @mock.patch('sktm.db.SktDb.commit_testrun')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_commit_patchtest(self, mock_sql, mock_get_repoid,
                               mock_commit_testrun, mock_get_baselineid,
@@ -76,7 +76,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
                               mock_unset_patchset_pending):
         """Ensure baseline is updated when current result is newer."""
         # pylint: disable=too-many-arguments
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_get_repoid.return_value = '1'
         mock_commit_testrun.return_value = '2'
@@ -100,13 +100,13 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         mock_sql.connect().commit.assert_called()
 
     @mock.patch('logging.debug')
-    @mock.patch('sktm.db.skt_db.commit_patch')
-    @mock.patch('sktm.db.skt_db.get_sourceid')
+    @mock.patch('sktm.db.SktDb.commit_patch')
+    @mock.patch('sktm.db.SktDb.get_sourceid')
     @mock.patch('sktm.db.sqlite3')
     def test_commit_series_without_id(self, mock_sql, mock_get_sourceid,
                                       mock_commit_patch, mock_log):
         """Ensure commit_series() creates patch records without series_id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_get_sourceid.return_value = '1'
         mock_commit_patch.return_value = None
@@ -131,15 +131,15 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         mock_sql.connect().commit.assert_called()
 
     @mock.patch('logging.debug')
-    @mock.patch('sktm.db.skt_db.commit_patch')
-    @mock.patch('sktm.db.skt_db.get_sourceid')
+    @mock.patch('sktm.db.SktDb.commit_patch')
+    @mock.patch('sktm.db.SktDb.get_sourceid')
     @mock.patch('sktm.db.sqlite3')
     def test_commit_series_without_id_empty_db(self, mock_sql,
                                                mock_get_sourceid,
                                                mock_commit_patch, mock_log):
         """Ensure commit_series() creates patch records with empty testdb."""
         # pylint: disable=invalid-name
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_get_sourceid.return_value = '1'
         mock_commit_patch.return_value = None
@@ -164,13 +164,13 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         mock_sql.connect().commit.assert_called()
 
     @mock.patch('logging.debug')
-    @mock.patch('sktm.db.skt_db.commit_patch')
-    @mock.patch('sktm.db.skt_db.get_sourceid')
+    @mock.patch('sktm.db.SktDb.commit_patch')
+    @mock.patch('sktm.db.SktDb.get_sourceid')
     @mock.patch('sktm.db.sqlite3')
     def test_commit_series_with_id(self, mock_sql, mock_get_sourceid,
                                    mock_commit_patch, mock_log):
         """Ensure commit_series() creates patch records with a series_id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_get_sourceid.return_value = '1'
         mock_commit_patch.return_value = None
@@ -192,7 +192,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_commit_testrun(self, mock_sql, mock_log):
         """Ensure commit_testrun() creates a testrun record."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         result = mock.Mock()
         result.value = 'ok'
@@ -218,7 +218,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_create_repoid(self, mock_sql):
         """Ensure create_repoid() inserts into DB and retrieves a repoid."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().lastrowid = 1
         result = testdb.create_repoid('git://example.com/repo')
 
@@ -227,7 +227,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_get_baselineid(self, mock_sql):
         """Ensure get_baselineid() returns baseline_id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_baselineid('baserepo_id', 'abcdef')
 
@@ -236,39 +236,39 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_get_baselineid_empty(self, mock_sql):
         """Ensure get_baselineid() returns None when no baseline_id exists."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_baselineid('baserepo_id', 'abcdef')
 
         self.assertIsNone(result)
 
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_get_baselineresult(self, mock_sql, mock_get_repoid):
         """Ensure get_baselineresult() returns baseline_id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_repoid.return_value = 1
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_baselineresult('baserepo_id', 'abcdef')
 
         self.assertEqual(result, 1)
 
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_get_baselineresult_empty(self, mock_sql, mock_get_repoid):
         """Ensure get_baselineresult() returns None for empty results."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_repoid.return_value = 1
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_baselineresult('baserepo_id', 'abcdef')
 
         self.assertIsNone(result)
 
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_get_commitdate(self, mock_sql, mock_get_repoid):
         """Ensure get_commitdate() returns baseline_id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_repoid.return_value = 1
 
         mock_sql.connect().cursor().fetchone.return_value = [1]
@@ -276,11 +276,11 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
         self.assertEqual(result, 1)
 
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_get_commitdate_empty(self, mock_sql, mock_get_repoid):
         """Ensure get_commitdate() returns None when no baselines match."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_repoid.return_value = 1
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_commitdate('baserepod', 'abcdef')
@@ -288,13 +288,13 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.assertIsNone(result)
 
     @mock.patch('logging.info')
-    @mock.patch('sktm.db.skt_db.get_sourceid')
+    @mock.patch('sktm.db.SktDb.get_sourceid')
     @mock.patch('sktm.db.sqlite3')
     def test_expired_pending_patches(self, mock_sql, mock_get_sourceid,
                                      mock_log):
         """Test with a list of expired pending patches."""
         # pylint: disable=invalid-name
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_get_sourceid.return_value = '1'
 
@@ -304,12 +304,12 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.assertEqual(result, ['1'])
         mock_log.assert_called_once()
 
-    @mock.patch('sktm.db.skt_db.get_sourceid')
+    @mock.patch('sktm.db.SktDb.get_sourceid')
     @mock.patch('sktm.db.sqlite3')
     def test_expired_pending_patches_empty(self, mock_sql, mock_get_sourceid):
         """Test with an empty list of expired pending patches."""
         # pylint: disable=invalid-name
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_get_sourceid.return_value = '1'
 
@@ -321,7 +321,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_last_checked_patch(self, mock_sql):
         """Ensure get_last_checked_patch() returns a patch id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_last_checked_patch('baseurl', 'project_id')
 
@@ -330,7 +330,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_last_checked_patch_missing(self, mock_sql):
         """Ensure None is returned when no patches match."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_last_checked_patch('baseurl', 'project_id')
 
@@ -339,7 +339,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_pending_patch_date(self, mock_sql):
         """Ensure get_last_pending_patch_date() returns a patch id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = ['2018-05-31']
         result = testdb.get_last_pending_patch_date('baseurl', 'project_id')
 
@@ -348,7 +348,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_pending_patch_date_missing(self, mock_sql):
         """Ensure None is returned when no patches match."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_last_pending_patch_date('baseurl', 'project_id')
 
@@ -357,7 +357,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_checked_patch_date(self, mock_sql):
         """Ensure get_last_checked_patch_date() returns a date."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_last_checked_patch_date('baseurl', 'project_id')
 
@@ -366,7 +366,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_checked_patch_date_missing(self, mock_sql):
         """Ensure None is returned when no patches match."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_last_checked_patch_date('baseurl', 'project_id')
 
@@ -375,7 +375,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_last_pending_patch(self, mock_sql):
         """Ensure get_last_pending_patch() returns a patch id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_last_pending_patch('baseurl', 'project_id')
 
@@ -384,7 +384,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_last_pending_patch_missing(self, mock_sql):
         """Ensure None is returned when no patches match."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_last_pending_patch('baseurl', 'project_id')
 
@@ -393,28 +393,28 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_get_repoid(self, mock_sql):
         """Ensure get_repoid() retrieves a repoid."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_repoid('git://example.com/repo')
 
         self.assertEqual(result, 1)
 
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_get_latest(self, mock_sql, mock_get_repoid):
         """Ensure get_latest() returns a result."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_repoid.return_value = 1
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_latest('baserepo_id')
 
         self.assertEqual(result, 1)
 
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_get_latest_empty(self, mock_sql, mock_get_repoid):
         """Ensure get_latest() returns None when results are empty."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_repoid.return_value = 1
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_latest('baserepo_id')
@@ -424,7 +424,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_get_repoid_missing(self, mock_sql):
         """Ensure get_repoid() creates a repoid when it doesn't exist."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = None
         mock_sql.connect().cursor().lastrowid = 1
         result = testdb.get_repoid('git://example.com/repo')
@@ -434,7 +434,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_get_series_result(self, mock_sql):
         """Ensure a testrun.result_id is returned."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_series_result(1)
 
@@ -443,7 +443,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_get_series_result_empty(self, mock_sql):
         """Ensure None is returned when the results list is empty."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_series_result(1)
 
@@ -452,7 +452,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_get_sourceid(self, mock_sql):
         """Ensure get_sourceid() retrieves a patchsource id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_sourceid('git://example.com/repo', 10)
 
@@ -461,29 +461,29 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_get_sourceid_missing(self, mock_sql):
         """Ensure get_sourceid() creates patchsource when it doesn't exist."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_sql.connect().cursor().fetchone.return_value = None
         mock_sql.connect().cursor().lastrowid = 1
         result = testdb.get_sourceid('git://example.com/repo', 10)
 
         self.assertEqual(result, 1)
 
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_get_stable(self, mock_sql, mock_get_repoid):
         """Ensure get_stable() returns baseline_id."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_repoid.return_value = 1
         mock_sql.connect().cursor().fetchone.return_value = [1]
         result = testdb.get_stable('baserepo_id')
 
         self.assertEqual(result, 1)
 
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_get_stable_empty(self, mock_sql, mock_get_repoid):
         """Ensure get_stable() returns None when results are empty."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_repoid.return_value = 1
         mock_sql.connect().cursor().fetchone.return_value = None
         result = testdb.get_stable('baserepo_id')
@@ -494,7 +494,7 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
     @mock.patch('sktm.db.sqlite3')
     def test_set_patchset_pending(self, mock_sql, mock_log):
         """Ensure patches are added to the pendingpatch table."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         testdb.set_patchset_pending('baseurl', '1', [('1', '2018-06-04')])
 
         mock_sql.connect().cursor().executemany.assert_called_once()
@@ -510,12 +510,12 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         )
 
     @mock.patch('logging.debug')
-    @mock.patch('sktm.db.skt_db.get_sourceid')
+    @mock.patch('sktm.db.SktDb.get_sourceid')
     @mock.patch('sktm.db.sqlite3')
     def test_unset_patchset_pending(self, mock_sql, mock_get_sourceid,
                                     mock_log):
         """Ensure patches are removed from the pendingpatch table."""
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
         mock_get_sourceid.return_value = 1
 
         testdb.unset_patchset_pending('baseurl', ['1'])
@@ -533,16 +533,16 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         mock_sql.connect().commit.assert_called()
 
     @mock.patch('logging.debug')
-    @mock.patch('sktm.db.skt_db.get_baselineresult')
-    @mock.patch('sktm.db.skt_db.commit_testrun')
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_baselineresult')
+    @mock.patch('sktm.db.SktDb.commit_testrun')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_update_baseline_new(self, mock_sql, mock_get_repoid,
                                  mock_commit_testrun, mock_get_baselineresult,
                                  mock_log):
         """Ensure new baslines are created when one doesn't exist."""
         # pylint: disable=too-many-arguments
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_get_repoid.return_value = '1'
         mock_commit_testrun.return_value = '1'
@@ -565,16 +565,16 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         mock_sql.connect().commit.assert_called()
 
     @mock.patch('logging.debug')
-    @mock.patch('sktm.db.skt_db.get_baselineresult')
-    @mock.patch('sktm.db.skt_db.commit_testrun')
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_baselineresult')
+    @mock.patch('sktm.db.SktDb.commit_testrun')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_update_baseline(self, mock_sql, mock_get_repoid,
                              mock_commit_testrun, mock_get_baselineresult,
                              mock_log):
         """Ensure baseline is updated when current result is newer."""
         # pylint: disable=too-many-arguments
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_get_repoid.return_value = '1'
         mock_commit_testrun.return_value = '1'
@@ -597,16 +597,16 @@ class TestDb(unittest.TestCase):  # pylint: disable=too-many-public-methods
         mock_sql.connect().commit.assert_called()
 
     @mock.patch('logging.debug')
-    @mock.patch('sktm.db.skt_db.get_baselineresult')
-    @mock.patch('sktm.db.skt_db.commit_testrun')
-    @mock.patch('sktm.db.skt_db.get_repoid')
+    @mock.patch('sktm.db.SktDb.get_baselineresult')
+    @mock.patch('sktm.db.SktDb.commit_testrun')
+    @mock.patch('sktm.db.SktDb.get_repoid')
     @mock.patch('sktm.db.sqlite3')
     def test_update_baseline_not_newer(self, mock_sql, mock_get_repoid,
                                        mock_commit_testrun,
                                        mock_get_baselineresult, mock_log):
         """Ensure baseline is updated when current result is older."""
         # pylint: disable=too-many-arguments
-        testdb = skt_db(self.database_file)
+        testdb = SktDb(self.database_file)
 
         mock_sql.reset_mock()
         mock_get_repoid.return_value = '1'

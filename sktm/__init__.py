@@ -66,7 +66,7 @@ class watcher(object):
         """
         # FIXME Clarify/fix member variable names
         # Database instance
-        self.db = sktm.db.skt_db(os.path.expanduser(dbpath))
+        self.db = sktm.db.SktDb(os.path.expanduser(dbpath))
         # Jenkins interface instance
         self.jk = sktm.jenkins.skt_jenkins(jenkinsurl, jenkinslogin,
                                            jenkinspassword)
