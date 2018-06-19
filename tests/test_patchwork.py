@@ -53,14 +53,16 @@ class TestObjectSummary(unittest.TestCase):
         )
 
     def test_is_patch_true(self):
-        """Ensure the is_patch() method returns true if patch_id set."""
-        result = self.testobj.is_patch()
+        """Ensure the __is_patch() method returns true if patch_id set."""
+        # pylint: disable=W0212,E1101
+        result = self.testobj._ObjectSummary__is_patch()
         self.assertTrue(result)
 
     def test_is_patch_false(self):
-        """Ensure the is_patch() method returns false if patch_id not set."""
+        """Ensure the __is_patch() method returns false if patch_id not set."""
+        # pylint: disable=W0212,E1101
         self.testobj.patch_id = None
-        result = self.testobj.is_patch()
+        result = self.testobj._ObjectSummary__is_patch()
         self.assertFalse(result)
 
     def test_get_mbox_url(self):
