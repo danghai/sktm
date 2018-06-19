@@ -70,7 +70,7 @@ class ObjectSummary(object):
         # Patchwork patch ID for patch objects
         self.patch_id = patch_id
 
-    def is_patch(self):
+    def __is_patch(self):
         """
         Check if the object is a patch.
 
@@ -247,14 +247,21 @@ class RpcWrapper(object):
         # RH-Patchwork API version
         self.version = 1010
 
+<<<<<<< HEAD
     def _wrap_call(self, rpc, name):
         """Wrap a RPC call, adding the expected version number as argument."""
         function = getattr(rpc, name)
+=======
+    def __wrap_call(self, rpc, name):
+        # Wrap a RPC call, adding the expected version number as argument
+        fn = getattr(rpc, name)
+>>>>>>> Mark sktm.patchwork private and protected methods
 
         def wrapper(*args, **kwargs):
             return function(self.version, *args, **kwargs)
         return wrapper
 
+<<<<<<< HEAD
     def _return_check(self, returned):
         """Returns the real return value without the version info."""
         version = self.version
@@ -271,6 +278,25 @@ class RpcWrapper(object):
     def __getattr__(self, name):
         """Add the RPC version checking call/return wrappers."""
         return self._return_unwrapper(self._wrap_call(self.rpc, name))
+=======
+    def __return_check(self, r):
+        # Returns just the real return value, without the version info.
+        v = self.version
+        if r[0] != v:
+            raise Exception(
+                'Patchwork API mismatch (%i, expected %i)' % (r[0], v)
+            )
+        return r[1]
+
+    def __return_unwrapper(self, fn):
+        def unwrap(*args, **kwargs):
+            return self.__return_check(fn(*args, **kwargs))
+        return unwrap
+
+    def __getattr__(self, name):
+        # Add the RPC version checking call/return wrappers
+        return self.__return_unwrapper(self.__wrap_call(self.rpc, name))
+>>>>>>> Mark sktm.patchwork private and protected methods
 
 
 class PatchworkProject(object):
@@ -288,13 +314,13 @@ class PatchworkProject(object):
                           default.
         """
         self.baseurl = baseurl
-        self.project_id = self.get_project_id(project_name)
+        self.project_id = self.__get_project_id(project_name)
         patterns_to_skip = SKIP_PATTERNS + skip
         logging.debug('Patch subject patterns to skip: %s', patterns_to_skip)
         self.skip = re.compile('|'.join(patterns_to_skip), re.IGNORECASE)
         self.is_rh_fork = is_rh_fork
 
-    def get_patch_message(self, patch_id):
+    def __get_patch_message(self, patch_id):
         """
         Retrieve patch's mbox as email object.
 
@@ -327,7 +353,7 @@ class PatchworkProject(object):
 
         return email.message_from_string(response.content)
 
-    def get_header_values_all(self, patch_id, *name_tuple):
+    def __get_header_values_all(self, patch_id, *name_tuple):
         """
         Get all values (or empty strings) for specified headers from a patch
         message.
@@ -342,7 +368,7 @@ class PatchworkProject(object):
             specified headers from the patch message, with a list of a single
             empty string for each missing header.
         """
-        mbox_email = self.get_patch_message(patch_id)
+        mbox_email = self.__get_patch_message(patch_id)
 
         value_list_tuple = ()
         for name in name_tuple:
@@ -352,7 +378,7 @@ class PatchworkProject(object):
             value_list_tuple += (value_list,)
         return value_list_tuple
 
-    def get_header_values_first(self, patch_id, *name_tuple):
+    def _get_header_values_first(self, patch_id, *name_tuple):
         """
         Get first values (or empty strings) of specified headers from a patch
         message.
@@ -368,9 +394,9 @@ class PatchworkProject(object):
             returned for missing headers.
         """
         return (value_list[0] for value_list in
-                self.get_header_values_all(patch_id, *name_tuple))
+                self.__get_header_values_all(patch_id, *name_tuple))
 
-    def get_emails(self, pid):
+    def _get_emails(self, pid):
         """
         Get all involved e-mail addresses from patch message headers.
 
@@ -384,7 +410,7 @@ class PatchworkProject(object):
         logging.debug("getting emails for patch %d from 'from', 'to', 'cc'",
                       pid)
         for header_value_list in \
-                self.get_header_values_all(pid, "From", "To", "Cc"):
+                self.__get_header_values_all(pid, "From", "To", "Cc"):
             email_set |= set(addr_tuple[1]
                              for addr_tuple
                              in email.utils.getaddresses(header_value_list)
@@ -393,7 +419,7 @@ class PatchworkProject(object):
 
         return email_set
 
-    def get_patch_url(self, patch):
+    def _get_patch_url(self, patch):
         """
         Build a Patchwork URL for passed patch object.
 
@@ -447,10 +473,10 @@ class skt_patchwork2(PatchworkProject):
         # Patchwork API authentication token.
         self.apikey = apikey
         # JSON representation of API URLs retrieved from the Patchwork server
-        self.apiurls = self.get_apiurls(baseurl)
+        self.apiurls = self.__get_apiurls(baseurl)
         super(skt_patchwork2, self).__init__(baseurl, projectname, skip)
 
-    def get_project_id(self, project_name):
+    def __get_project_id(self, project_name):
         """
         Retrieve project ID based on project's name.
 
@@ -467,7 +493,7 @@ class skt_patchwork2(PatchworkProject):
                             (project_name, response.status_code))
         return response.json().get('id')
 
-    def get_apiurls(self, baseurl):
+    def __get_apiurls(self, baseurl):
         """
         Retrieve JSON representation of the list of API URLs supported by the
         Patchwork server.
@@ -481,7 +507,7 @@ class skt_patchwork2(PatchworkProject):
 
         return response.json()
 
-    def get_series_from_url(self, url):
+    def __get_series_from_url(self, url):
         """
         Retrieve a list of applicable series summaries for the specified
         series URL. Series or patches matching skip patterns (self.skip) are
@@ -496,8 +522,13 @@ class skt_patchwork2(PatchworkProject):
         """
         series_list = list()
 
+<<<<<<< HEAD
         logging.debug("get_series_from_url %s", url)
         response = requests.get(url)
+=======
+        logging.debug("__get_series_from_url %s", url)
+        r = requests.get(url)
+>>>>>>> Mark sktm.patchwork private and protected methods
 
         if response.status_code != 200:
             raise Exception("Can't get series from url %s (%d)" %
@@ -546,10 +577,10 @@ class skt_patchwork2(PatchworkProject):
                     continue
 
                 message_id, subject = \
-                    self.get_header_values_first(patch.get("id"),
-                                                 'Message-ID',
-                                                 'Subject')
-                emails = self.get_emails(patch.get("id"))
+                    self._get_header_values_first(patch.get("id"),
+                                                  'Message-ID',
+                                                  'Subject')
+                emails = self._get_emails(patch.get("id"))
                 logging.debug("patch [%d] message_id: %s", patch.get("id"),
                               message_id)
                 logging.debug("patch [%d] subject: %s", patch.get("id"),
@@ -560,7 +591,7 @@ class skt_patchwork2(PatchworkProject):
                 series_summary.set_subject(subject)
                 series_summary.merge_email_addr_set(emails)
                 series_summary.add_patch(
-                    ObjectSummary(self.get_patch_url(patch),
+                    ObjectSummary(self._get_patch_url(patch),
                                   self._get_mbox_url_sfx(),
                                   patch.get("date"),
                                   patch.get("id"))
@@ -582,11 +613,11 @@ class skt_patchwork2(PatchworkProject):
             if m:
                 nurl = m.group(1)
                 # TODO Limit recursion
-                series_list += self.get_series_from_url(nurl)
+                series_list += self.__get_series_from_url(nurl)
 
         return series_list
 
-    def get_patchsets_from_events(self, url):
+    def __get_patchsets_from_events(self, url):
         """
         Retrieve a list of applicable series summaries for the specified
         event list URL. Series and patches which names match one of skip
@@ -600,8 +631,13 @@ class skt_patchwork2(PatchworkProject):
         """
         series_list = list()
 
+<<<<<<< HEAD
         logging.debug("get_patchsets_from_events: %s", url)
         response = requests.get(url)
+=======
+        logging.debug("__get_patchsets_from_events: %s", url)
+        r = requests.get(url)
+>>>>>>> Mark sktm.patchwork private and protected methods
 
         if response.status_code != 200:
             raise Exception("Can't get events from url %s (%d)" %
@@ -624,7 +660,7 @@ class skt_patchwork2(PatchworkProject):
             if self.nsince is None or self.nsince < edate:
                 self.nsince = edate
 
-            series_list += self.get_series_from_url(series.get("url"))
+            series_list += self.__get_series_from_url(series.get("url"))
 
         link = response.headers.get("Link")
         if link is not None:
@@ -632,11 +668,11 @@ class skt_patchwork2(PatchworkProject):
             if m:
                 nurl = m.group(1)
                 # TODO Limit recursion
-                series_list += self.get_patchsets_from_events(nurl)
+                series_list += self.__get_patchsets_from_events(nurl)
 
         return series_list
 
-    def _set_patch_check(self, patch, payload):
+    def __set_patch_check(self, patch, payload):
         """
         Add a patch "check" payload for the specified JSON representation of a
         patch.
@@ -686,7 +722,7 @@ class skt_patchwork2(PatchworkProject):
             payload['state'] = PW_CHECK_CHOICES['fail']
             payload['description'] = str(result)
 
-        self._set_patch_check(self.get_patch_by_id(pid), payload)
+        self.__set_patch_check(self.get_patch_by_id(pid), payload)
 
     def get_patch_by_id(self, pid):
         """
@@ -708,7 +744,7 @@ class skt_patchwork2(PatchworkProject):
 
         return response.json()
 
-    def get_patchsets_by_patch(self, url, seen=set()):
+    def __get_patchsets_by_patch(self, url, seen=set()):
         """
         Retrieve a list of series summaries, which weren't already "seen", and
         which contain the patch or patches available at the specified URL.
@@ -725,8 +761,13 @@ class skt_patchwork2(PatchworkProject):
         """
         series_list = list()
 
+<<<<<<< HEAD
         logging.debug("get_patchsets_by_patch %s", url)
         response = requests.get(url)
+=======
+        logging.debug("__get_patchsets_by_patch %s", url)
+        r = requests.get(url)
+>>>>>>> Mark sktm.patchwork private and protected methods
 
         if response.status_code != 200:
             raise Exception("Can't get series from url %s (%d)" %
@@ -745,7 +786,7 @@ class skt_patchwork2(PatchworkProject):
                 if sid in seen:
                     continue
                 else:
-                    series_list += self.get_series_from_url("%s/%d" % (
+                    series_list += self.__get_series_from_url("%s/%d" % (
                         self.apiurls.get("series"),
                         sid
                     ))
@@ -757,7 +798,7 @@ class skt_patchwork2(PatchworkProject):
             if m:
                 nurl = m.group(1)
                 # TODO Limit recursion
-                series_list += self.get_patchsets_by_patch(nurl, seen)
+                series_list += self.__get_patchsets_by_patch(nurl, seen)
 
         return series_list
 
@@ -778,12 +819,12 @@ class skt_patchwork2(PatchworkProject):
         ) + datetime.timedelta(seconds=1)
 
         logging.debug("get_new_patchsets since %s", nsince.isoformat())
-        new_series = self.get_patchsets_by_patch("%s?project=%d&since=%s" %
-                                                 (self.apiurls.get("patches"),
-                                                  self.project_id,
-                                                  urllib.quote(
-                                                      nsince.isoformat()
-                                                  )))
+        new_series = self.__get_patchsets_by_patch(
+            "%s?project=%d&since=%s" % (self.apiurls.get("patches"),
+                                        self.project_id,
+                                        urllib.quote(
+                                            nsince.isoformat()
+                                        )))
         return new_series
 
     def get_patchsets(self, patchlist):
@@ -811,7 +852,7 @@ class skt_patchwork2(PatchworkProject):
                 for series in patch.get("series"):
                     sid = series.get("id")
                     if sid not in seen:
-                        series_list += self.get_series_from_url("%s/%d" % (
+                        series_list += self.__get_series_from_url("%s/%d" % (
                             self.apiurls.get("series"),
                             sid
                         ))
@@ -839,7 +880,7 @@ class skt_patchwork(PatchworkProject):
         # Only set if it's a RH fork.
         self.fields = None
         # XML RPC interface to Patchwork
-        self.rpc = self.get_rpc(baseurl)
+        self.rpc = self.__get_rpc(baseurl)
         # Maximum processed patch ID
         self.lastpatch = lastpatch
         # A dictionary of patch series identified by a "series ID".
@@ -860,7 +901,7 @@ class skt_patchwork(PatchworkProject):
         )
 
     # FIXME Just move this into __init__
-    def get_rpc(self, baseurl):
+    def __get_rpc(self, baseurl):
         """
         Create an XML RPC interface for a Patchwork base URL and initialize
         compatibility information.
@@ -896,7 +937,7 @@ class skt_patchwork(PatchworkProject):
 
         return rpc
 
-    def log_patch(self, id, name, message_id, emails):
+    def __log_patch(self, id, name, message_id, emails):
         """
         Log patch ID, name, Message-ID, and e-mails.
 
@@ -910,7 +951,7 @@ class skt_patchwork(PatchworkProject):
         logging.info("patch %d message_id: %s", id, message_id)
         logging.info("patch %d emails: %s", id, emails)
 
-    def update_patch_name(self, patch):
+    def __update_patch_name(self, patch):
         """
         Set patch name in a patch XML RPC object from its e-mail Subject, for
         patches coming from internal Red Hat instance, where patch names are
@@ -957,11 +998,11 @@ class skt_patchwork(PatchworkProject):
             logging.warning("Failed to get data for patch %d", pid)
             patch = None
 
-        self.update_patch_name(patch)
+        self.__update_patch_name(patch)
 
         return patch
 
-    def get_patch_list(self, filt):
+    def __get_patch_list(self, filt):
         """
         Get a list of patch XML RPC objects, filtered according to the
         specified filter dictionary.
@@ -982,7 +1023,7 @@ class skt_patchwork(PatchworkProject):
 
         # rewrite all subject lines back to original
         for patch in patches:
-            self.update_patch_name(patch)
+            self.__update_patch_name(patch)
 
         return patches
 
@@ -1001,7 +1042,7 @@ class skt_patchwork(PatchworkProject):
         pass
 
     # TODO Move this to __init__ or make it a class method
-    def get_project_id(self, projectname):
+    def __get_project_id(self, projectname):
         """
         Retrieve ID of the project with the specified name.
 
@@ -1025,7 +1066,7 @@ class skt_patchwork(PatchworkProject):
         raise Exception("Couldn't find project %s" % projectname)
 
     # FIXME This doesn't just parse a patch. Name/refactor accordingly.
-    def parse_patch(self, patch):
+    def __parse_patch(self, patch):
         """
         Accumulate an XML RPC patch object into the patch series dictionary,
         skipping patches with names matching skip regex (self.skip), and
@@ -1118,7 +1159,7 @@ class skt_patchwork(PatchworkProject):
                     cover = self.covers.get(seriesid)
                     if cover:
                         result.set_cover_letter(
-                            ObjectSummary(self.get_patch_url(cover),
+                            ObjectSummary(self._get_patch_url(cover),
                                           self._get_mbox_url_sfx(),
                                           cover.get("date").replace(" ", "T"),
                                           cover.get("id"))
@@ -1129,17 +1170,17 @@ class skt_patchwork(PatchworkProject):
                         patch = self.series[seriesid].get(cpatch)
                         pid = patch.get("id")
                         message_id, subject = \
-                            self.get_header_values_first(pid,
-                                                         'Message-ID',
-                                                         'Subject')
-                        emails = self.get_emails(pid)
-                        self.log_patch(pid, patch.get("name"),
-                                       message_id, emails)
+                            self._get_header_values_first(pid,
+                                                          'Message-ID',
+                                                          'Subject')
+                        emails = self._get_emails(pid)
+                        self.__log_patch(pid, patch.get("name"),
+                                         message_id, emails)
                         result.set_message_id(message_id)
                         result.set_subject(subject)
                         result.merge_email_addr_set(emails)
                         result.add_patch(
-                            ObjectSummary(self.get_patch_url(patch),
+                            ObjectSummary(self._get_patch_url(patch),
                                           self._get_mbox_url_sfx(),
                                           patch.get("date").replace(" ", "T"),
                                           pid)
@@ -1157,17 +1198,17 @@ class skt_patchwork(PatchworkProject):
                 return result
         # Else, it's a single patch
         else:
-            message_id, subject = self.get_header_values_first(pid,
-                                                               'Message-ID',
-                                                               'Subject')
-            emails = self.get_emails(pid)
-            self.log_patch(pid, pname, message_id, emails)
+            message_id, subject = self._get_header_values_first(pid,
+                                                                'Message-ID',
+                                                                'Subject')
+            emails = self._get_emails(pid)
+            self.__log_patch(pid, pname, message_id, emails)
             result = SeriesSummary()
             result.set_message_id(message_id)
             result.set_subject(subject)
             result.merge_email_addr_set(emails)
             result.add_patch(
-                ObjectSummary(self.get_patch_url(patch),
+                ObjectSummary(self._get_patch_url(patch),
                               self._get_mbox_url_sfx(),
                               patch.get("date").replace(" ", "T"),
                               pid)
@@ -1190,9 +1231,9 @@ class skt_patchwork(PatchworkProject):
         series_list = list()
 
         logging.debug("get_new_patchsets: %d", self.lastpatch)
-        for patch in self.get_patch_list({'project_id': self.project_id,
-                                          'id__gt': self.lastpatch}):
-            pset = self.parse_patch(patch)
+        for patch in self.__get_patch_list({'project_id': self.project_id,
+                                            'id__gt': self.lastpatch}):
+            pset = self.__parse_patch(patch)
             if pset:
                 series_list.append(pset)
         return series_list
@@ -1217,7 +1258,7 @@ class skt_patchwork(PatchworkProject):
         for pid in patchlist:
             patch = self.get_patch_by_id(pid)
             if patch:
-                pset = self.parse_patch(patch)
+                pset = self.__parse_patch(patch)
                 if pset:
                     series_list.append(pset)
         return series_list
