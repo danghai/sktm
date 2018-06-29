@@ -23,7 +23,7 @@ import sktm
 class SktDb(object):
     def __init__(self, db):
         if not os.path.isfile(db):
-            self.createdb(db)
+            self.__createdb(db)
 
         self.conn = sqlite3.connect(db)
         self.cur = self.conn.cursor()
@@ -31,7 +31,7 @@ class SktDb(object):
     def __del__(self):
         self.conn.close()
 
-    def createdb(self, db):
+    def __createdb(self, db):
         conn = sqlite3.connect(db)
         cur = conn.cursor()
 
@@ -88,7 +88,7 @@ class SktDb(object):
         cur.close()
         conn.close()
 
-    def create_repoid(self, baserepo):
+    def __create_repoid(self, baserepo):
         """Create a repoid for a git repo URL.
 
         Args:
@@ -101,7 +101,7 @@ class SktDb(object):
 
         return self.cur.lastrowid
 
-    def get_repoid(self, baserepo):
+    def __get_repoid(self, baserepo):
         """Fetch a repoid for a git repo URL.
 
         Args:
@@ -115,11 +115,11 @@ class SktDb(object):
         result = self.cur.fetchone()
 
         if not result:
-            return self.create_repoid(baserepo)
+            return self.__create_repoid(baserepo)
 
         return result[0]
 
-    def create_sourceid(self, baseurl, project_id):
+    def __create_sourceid(self, baseurl, project_id):
         """Create a patchsource record that links a baseurl and project_id.
 
         Args:
@@ -134,7 +134,7 @@ class SktDb(object):
 
         return self.cur.lastrowid
 
-    def get_sourceid(self, baseurl, project_id):
+    def __get_sourceid(self, baseurl, project_id):
         """Fetch a patchsource id that links a baseurl and project_id.
 
         Args:
@@ -150,7 +150,7 @@ class SktDb(object):
         result = self.cur.fetchone()
 
         if not result:
-            return self.create_sourceid(baseurl, project_id)
+            return self.__create_sourceid(baseurl, project_id)
 
         return result[0]
 
@@ -162,7 +162,7 @@ class SktDb(object):
             project_id: Project ID in Patchwork.
 
         """
-        sourceid = self.get_sourceid(baseurl, project_id)
+        sourceid = self.__get_sourceid(baseurl, project_id)
 
         self.cur.execute('SELECT patch.id FROM patch WHERE '
                          'patchsource_id = ? '
@@ -183,7 +183,7 @@ class SktDb(object):
             project_id: Project ID in Patchwork.
 
         """
-        sourceid = self.get_sourceid(baseurl, project_id)
+        sourceid = self.__get_sourceid(baseurl, project_id)
 
         self.cur.execute('SELECT id FROM pendingpatches WHERE '
                          'patchsource_id = ? '
@@ -204,7 +204,7 @@ class SktDb(object):
             project_id: Project ID in Patchwork.
 
         """
-        sourceid = self.get_sourceid(baseurl, project_id)
+        sourceid = self.__get_sourceid(baseurl, project_id)
 
         self.cur.execute('SELECT patch.date FROM patch WHERE '
                          'patchsource_id = ? '
@@ -225,7 +225,7 @@ class SktDb(object):
             project_id: Project ID in Patchwork.
 
         """
-        sourceid = self.get_sourceid(baseurl, project_id)
+        sourceid = self.__get_sourceid(baseurl, project_id)
 
         self.cur.execute('SELECT pdate FROM pendingpatches WHERE '
                          'patchsource_id = ? '
@@ -256,7 +256,7 @@ class SktDb(object):
             List of patch IDs.
         """
         patchlist = list()
-        sourceid = self.get_sourceid(baseurl, project_id)
+        sourceid = self.__get_sourceid(baseurl, project_id)
         tstamp = int(time.time()) - exptime
 
         self.cur.execute('SELECT id FROM pendingpatches WHERE '
@@ -272,7 +272,7 @@ class SktDb(object):
 
         return patchlist
 
-    def get_baselineid(self, baserepo_id, commithash):
+    def __get_baselineid(self, baserepo_id, commithash):
         """Get the baseline_id for a particular baserepo_id and commithash.
 
         Args:
@@ -290,7 +290,7 @@ class SktDb(object):
 
         return result[0]
 
-    def get_commitdate(self, baserepo, commithash):
+    def __get_commitdate(self, baserepo, commithash):
         """Get the date of a commit in a baseline.
 
         Args:
@@ -301,7 +301,7 @@ class SktDb(object):
             Date string or None if the commithash is not found.
 
         """
-        baserepo_id = self.get_repoid(baserepo)
+        baserepo_id = self.__get_repoid(baserepo)
 
         self.cur.execute('SELECT commitdate FROM baseline WHERE '
                          'commitid = ? AND '
@@ -314,7 +314,7 @@ class SktDb(object):
 
         return result[0]
 
-    def get_baselineresult(self, baserepo, commithash):
+    def __get_baselineresult(self, baserepo, commithash):
         """Get the result of a baseline testrun.
 
         Args:
@@ -326,7 +326,7 @@ class SktDb(object):
             exist.
 
         """
-        baserepo_id = self.get_repoid(baserepo)
+        baserepo_id = self.__get_repoid(baserepo)
 
         self.cur.execute('SELECT testrun.result_id FROM baseline, testrun '
                          'WHERE baseline.commitid = ? AND '
@@ -351,7 +351,7 @@ class SktDb(object):
             Latest stable commit ID, or None, if there are no stable commits.
 
         """
-        baserepo_id = self.get_repoid(baserepo)
+        baserepo_id = self.__get_repoid(baserepo)
 
         self.cur.execute('SELECT commitid FROM baseline, testrun WHERE '
                          'baseline.baserepo_id = ? AND '
@@ -367,7 +367,7 @@ class SktDb(object):
 
         return result[0]
 
-    def get_latest(self, baserepo):
+    def __get_latest(self, baserepo):
         """Get the commit hash of the latest baseline.
 
         Args:
@@ -378,7 +378,7 @@ class SktDb(object):
             exist.
 
         """
-        baserepo_id = self.get_repoid(baserepo)
+        baserepo_id = self.__get_repoid(baserepo)
 
         self.cur.execute('SELECT commitid FROM baseline WHERE '
                          'baserepo_id = ? '
@@ -409,7 +409,7 @@ class SktDb(object):
                          patch date string.
 
         """
-        sourceid = self.get_sourceid(baseurl, project_id)
+        sourceid = self.__get_sourceid(baseurl, project_id)
         tstamp = int(time.time())
 
         logging.debug("setting patches as pending: %s", series_data)
@@ -421,7 +421,7 @@ class SktDb(object):
                               (patch_id, patch_date) in series_data])
         self.conn.commit()
 
-    def unset_patchset_pending(self, baseurl, patch_id_list):
+    def __unset_patchset_pending(self, baseurl, patch_id_list):
         """Remove a patch from the list of pending patches.
 
         Remove each specified patch from the list of "pending" patches, for
@@ -456,11 +456,11 @@ class SktDb(object):
             build_id:   The build ID of the test run.
 
         """
-        baserepo_id = self.get_repoid(baserepo)
+        baserepo_id = self.__get_repoid(baserepo)
 
-        testrun_id = self.commit_testrun(result, build_id)
+        testrun_id = self.__commit_testrun(result, build_id)
 
-        prev_res = self.get_baselineresult(baserepo, commithash)
+        prev_res = self.__get_baselineresult(baserepo, commithash)
         logging.debug("previous result: %s", prev_res)
 
         if prev_res is None:
@@ -493,9 +493,9 @@ class SktDb(object):
              patch_date) in patches:
             # TODO: Can accumulate per-project list instead of doing it one by
             # one
-            self.unset_patchset_pending(baseurl, [patch_id])
+            self.__unset_patchset_pending(baseurl, [patch_id])
 
-    def commit_testrun(self, result, buildid):
+    def __commit_testrun(self, result, buildid):
         """Add a test run to the database.
 
         Args:
@@ -503,15 +503,16 @@ class SktDb(object):
             build_id:   The build ID of the test run.
 
         """
-        logging.debug("commit_testrun: result=%s; buildid=%d", result, buildid)
+        logging.debug("__commit_testrun: result=%s; buildid=%d",
+                      result, buildid)
         self.cur.execute('INSERT INTO testrun(result_id, build_id) '
                          'VALUES(?,?)',
                          (result.value, buildid))
         self.conn.commit()
         return self.cur.lastrowid
 
-    def commit_patch(self, patch_id, patch_name, patch_url, baseurl,
-                     project_id, patch_date):
+    def __commit_patch(self, patch_id, patch_name, patch_url, baseurl,
+                       project_id, patch_date):
         """Create/update a patch record in the database.
 
         Args:
@@ -524,8 +525,8 @@ class SktDb(object):
 
         """
         # pylint: disable=too-many-arguments
-        logging.debug("commit_patch: pid=%s", patch_id)
-        source_id = self.get_sourceid(baseurl, project_id)
+        logging.debug("__commit_patch: pid=%s", patch_id)
+        source_id = self.__get_sourceid(baseurl, project_id)
         self.cur.execute('INSERT OR REPLACE INTO patch(id, name, url, '
                          'patchsource_id, date) '
                          'VALUES(?,?,?,?,?)',
@@ -544,11 +545,11 @@ class SktDb(object):
         for (patch_id, patch_name, patch_url, baseurl, project_id,
              patch_date) in patches:
             # If the source_id doesn't exist, this method will create it.
-            self.get_sourceid(baseurl, project_id)
+            self.__get_sourceid(baseurl, project_id)
 
             # Add the patches to the database
-            self.commit_patch(patch_id, patch_name, patch_url, baseurl,
-                              project_id, patch_date)
+            self.__commit_patch(patch_id, patch_name, patch_url, baseurl,
+                                project_id, patch_date)
 
         self.conn.commit()
 
@@ -574,9 +575,9 @@ class SktDb(object):
         for (burl,) in self.cur.fetchall():
             print("repo url:", burl)
             stable = self.get_stable(burl)
-            latest = self.get_latest(burl)
+            latest = self.__get_latest(burl)
             print("most recent stable commit: {} ({})".format(
-                stable, self.get_commitdate(burl, stable)))
+                stable, self.__get_commitdate(burl, stable)))
             print("most recent stable commit: {} ({})".format(
-                latest, self.get_commitdate(burl, latest)))
+                latest, self.__get_commitdate(burl, latest)))
             print("---")
