@@ -924,8 +924,8 @@ class skt_patchwork(PatchworkProject):
         """
         if 'root_comment' in patch:
             # internal RH only: rewrite the original subject line
-            e = email.message_from_string(patch['root_comment']['headers'])
-            subject = e.get('Subject')
+            msg = email.message_from_string(patch['root_comment']['headers'])
+            subject = msg.get('Subject')
             if subject is not None:
                 subject = subject.replace('\n\t', ' ').replace('\n', ' ')
             # TODO What happens when subject is None?

@@ -68,9 +68,9 @@ class skt_jenkins(object):
             raise Exception("No results for build %d (%s)" %
                             (buildid, build.get_status()))
 
-        for (k, v) in build.get_resultset().iteritems():
-            if k == stepname:
-                value_list.append(v.__dict__[key])
+        for (result_key, value) in build.get_resultset().iteritems():
+            if result_key == stepname:
+                value_list.append(value.__dict__[key])
 
         return value_list
 
@@ -256,9 +256,9 @@ class skt_jenkins(object):
 
         # Find earliest (worst) step failure
         step_failure_result_list = [
-            ("skt.cmd_merge",   sktm.tresult.MERGE_FAILURE),
-            ("skt.cmd_build",   sktm.tresult.BUILD_FAILURE),
-            ("skt.cmd_run",     sktm.tresult.TEST_FAILURE),
+            ("skt.cmd_merge", sktm.tresult.MERGE_FAILURE),
+            ("skt.cmd_build", sktm.tresult.BUILD_FAILURE),
+            ("skt.cmd_run", sktm.tresult.TEST_FAILURE),
         ]
         for (step, failure_result) in step_failure_result_list:
             if set(self.__get_data_list(jobname, buildid, step, "status")) & \

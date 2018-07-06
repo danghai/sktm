@@ -32,12 +32,12 @@ class SktDb(object):
         self.conn.close()
 
     def createdb(self, db):
-        tc = sqlite3.connect(db)
-        c = tc.cursor()
+        conn = sqlite3.connect(db)
+        cur = conn.cursor()
 
         # FIXME The "patchsource_id" field should be a part of the primary key
         #       for "patch" table.
-        c.executescript("""
+        cur.executescript("""
                 PRAGMA foreign_keys = on;
 
                 CREATE TABLE baserepo(
@@ -84,9 +84,9 @@ class SktDb(object):
                   FOREIGN KEY(testrun_id) REFERENCES testrun(id)
                 );""")
 
-        tc.commit()
-        c.close()
-        tc.close()
+        conn.commit()
+        cur.close()
+        conn.close()
 
     def create_repoid(self, baserepo):
         """Create a repoid for a git repo URL.
@@ -576,7 +576,7 @@ class SktDb(object):
             stable = self.get_stable(burl)
             latest = self.get_latest(burl)
             print("most recent stable commit: {} ({})".format(
-                  stable, self.get_commitdate(burl, stable)))
+                stable, self.get_commitdate(burl, stable)))
             print("most recent stable commit: {} ({})".format(
-                  latest, self.get_commitdate(burl, latest)))
+                latest, self.get_commitdate(burl, latest)))
             print("---")
