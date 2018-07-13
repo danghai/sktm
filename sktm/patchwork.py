@@ -25,7 +25,7 @@ import xmlrpclib
 import dateutil.parser
 import requests
 
-import sktm
+import sktm.misc
 
 
 SKIP_PATTERNS = [
@@ -658,14 +658,14 @@ class skt_patchwork2(PatchworkProject):
     def set_patch_check(self, pid, jurl, result):
         """
         Add a patch "check" for the specified patch, with the specified
-        Jenkins build URL and result (sktm.tresult). The result cannot be
-        sktm.tresult.ERROR.
+        Jenkins build URL and result (sktm.misc.TestResult). The result
+        cannot be sktm.misc.TestResult.ERROR.
 
         Args:
             pid:    The ID of the patch to add the "check" for.
             jurl:   Jenkins build URL for the "check" to reference.
-            result: Test result (sktm.tresult) to feature in the "check"
-                    state.
+            result: Test result (sktm.misc.TestResult) to feature
+                    in the "check" state.
         """
         if self.apikey is None:
             logging.debug("No patchwork api key provided, not setting checks")
@@ -676,7 +676,7 @@ class skt_patchwork2(PatchworkProject):
                    'target_url': jurl,
                    'context': 'Kernel CI',
                    'description': 'Kernel CI testing'}
-        if result == sktm.tresult.SUCCESS:
+        if result == sktm.misc.TestResult.SUCCESS:
             payload['state'] = PW_CHECK_CHOICES['success']
         else:
             payload['state'] = PW_CHECK_CHOICES['fail']
@@ -988,14 +988,14 @@ class skt_patchwork(PatchworkProject):
     def set_patch_check(self, pid, jurl, result):
         """
         Add a patch "check" for the specified patch, with the specified
-        Jenkins build URL and result (sktm.tresult). The result cannot be
-        sktm.tresult.ERROR.
+        Jenkins build URL and result (sktm.misc.TestResult). The result
+        cannot be sktm.TestResult.ERROR.
 
         Args:
             pid:    The ID of the patch to add the "check" for.
             jurl:   Jenkins build URL for the "check" to reference.
-            result: Test result (sktm.tresult) to feature in the "check"
-                    state.
+            result: Test result (sktm.misc.TestResult) to feature
+                    in the "check" state.
         """
         # TODO: Implement this for xmlrpc
         pass

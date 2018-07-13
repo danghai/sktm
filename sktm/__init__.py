@@ -22,6 +22,7 @@ import enum
 
 import sktm.db
 import sktm.jenkins
+import sktm.misc
 import sktm.patchwork
 
 
@@ -41,15 +42,6 @@ def join_with_slash(base, *suffix):
         parts.append(arg.strip('/'))
     ending = '/' if arg.endswith('/') else ''
     return '/'.join(parts) + ending
-
-
-class tresult(enum.IntEnum):
-    """Test result"""
-    ERROR = -1
-    SUCCESS = 0
-    MERGE_FAILURE = 1
-    BUILD_FAILURE = 2
-    TEST_FAILURE = 4
 
 
 class jtype(enum.IntEnum):
@@ -360,7 +352,7 @@ class watcher(object):
                              pjt, bid, bres.name, rurl)
                 self.pj.remove((pjt, bid, cpw))
 
-                if bres == sktm.tresult.ERROR:
+                if bres == sktm.misc.TestResult.ERROR:
                     logging.warning("job completed with an error, ignoring")
                     continue
 

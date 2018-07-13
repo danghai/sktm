@@ -18,7 +18,7 @@ import time
 
 import jenkinsapi
 
-import sktm
+import sktm.misc
 
 
 class skt_jenkins(object):
@@ -234,7 +234,7 @@ class skt_jenkins(object):
             buildid:    Jenkins build ID.
 
         Return:
-            Status of the build (an sktm.tresult).
+            Status of the build (an sktm.misc.TestResult).
         """
         build = self._wait_and_get_build(jobname, buildid)
 
@@ -242,13 +242,13 @@ class skt_jenkins(object):
         logging.info("build_status=%s", bstatus)
 
         if bstatus == "SUCCESS":
-            return sktm.tresult.SUCCESS
+            return sktm.misc.TestResult.SUCCESS
         elif bstatus == "UNSTABLE":
             # Find earliest (worst) step failure
             step_failure_result_list = [
-                ("skt.cmd_merge", sktm.tresult.MERGE_FAILURE),
-                ("skt.cmd_build", sktm.tresult.BUILD_FAILURE),
-                ("skt.cmd_run", sktm.tresult.TEST_FAILURE),
+                ("skt.cmd_merge", sktm.misc.TestResult.MERGE_FAILURE),
+                ("skt.cmd_build", sktm.misc.TestResult.BUILD_FAILURE),
+                ("skt.cmd_run", sktm.misc.TestResult.TEST_FAILURE),
             ]
             for (step, failure_result) in step_failure_result_list:
                 if set(self.__get_data_list(jobname, buildid,
@@ -260,7 +260,7 @@ class skt_jenkins(object):
                             bstatus)
         else:
             logging.warning("Reporting build status \"%s\" as error", bstatus)
-        return sktm.tresult.ERROR
+        return sktm.misc.TestResult.ERROR
 
     # FIXME Clarify/fix argument names
     def build(self, jobname, baserepo=None, ref=None, baseconfig=None,
