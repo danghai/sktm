@@ -185,8 +185,7 @@ class JenkinsProject(object):
         return self.__get_cfg_data_uniform(buildid, "skt.cmd_merge",
                                            "basehead")
 
-    # FIXME Clarify function name
-    def get_patchwork(self, buildid):
+    def get_patch_url_list(self, buildid):
         """
         Get the list of Patchwork patch URLs for the specified completed
         build. Wait for the build to complete, if it hasn't yet.
@@ -296,24 +295,25 @@ class JenkinsProject(object):
 
     # FIXME Clarify/fix argument names
     def build(self, baserepo=None, ref=None, baseconfig=None,
-              message_id=None, subject=None, emails=set(), patchwork=[],
+              message_id=None, subject=None, emails=set(), patch_url_list=[],
               makeopts=None):
         """
         Submit a build of a patch series.
 
         Args:
-            baserepo:   Baseline Git repo URL.
-            ref:        Baseline Git reference to test.
-            baseconfig: Kernel configuration URL.
-            message_id: Value of the "Message-Id" header of the e-mail
-                        message representing the series, or None if unknown.
-            subject:    Subject of the message representing the series, or
-                        None if unknown.
-            emails:     Set of e-mail addresses involved with the series to
-                        send notifications to.
-            patchwork:  List of URLs pointing to patches to apply.
-            makeopts:   String of extra arguments to pass to the build's make
-                        invocation.
+            baserepo:        Baseline Git repo URL.
+            ref:             Baseline Git reference to test.
+            baseconfig:      Kernel configuration URL.
+            message_id:      Value of the "Message-Id" header of the e-mail
+                             message representing the patchset, or None if
+                             unknown.
+            subject:         Subject of the message representing the series,
+                             or None if unknown.
+            emails:          Set of e-mail addresses involved with the series
+                             to send notifications to.
+            patch_url_list:  List of URLs pointing to patches to apply.
+            makeopts:        String of extra arguments to pass to the build's
+                             make invocation.
 
         Returns:
             Submitted build number.
@@ -337,8 +337,8 @@ class JenkinsProject(object):
         if emails:
             params["emails"] = ",".join(emails)
 
-        if patchwork:
-            params["patchwork"] = " ".join(patchwork)
+        if patch_url_list:
+            params["patchwork"] = " ".join(patch_url_list)
 
         if makeopts is not None:
             params["makeopts"] = makeopts
