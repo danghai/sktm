@@ -339,7 +339,6 @@ class watcher(object):
 
     def check_pending(self):
         for (pjt, bid, cpw) in self.pj:
-<<<<<<< HEAD
             if self.jk.is_build_complete(self.jobname, bid):
                 bres = self.jk.get_result(self.jobname, bid)
                 rurl = self.jk.get_result_url(self.jobname, bid)
@@ -349,10 +348,8 @@ class watcher(object):
                 logging.info("job completed: "
                              "type=%d; jjid=%d; result=%s; url=%s",
                              pjt, bid, bres.name, rurl)
-=======
             if self.jk.is_build_complete(bid):
                 logging.info("job completed: jjid=%d; type=%d", bid, pjt)
->>>>>>> Convert Jenkins interface to Jenkins project interface
                 self.pj.remove((pjt, bid, cpw))
 
                 if bres == sktm.misc.TestResult.ERROR:
@@ -362,21 +359,16 @@ class watcher(object):
                 if pjt == sktm.jtype.BASELINE:
                     self.db.update_baseline(
                         self.baserepo,
-<<<<<<< HEAD
                         basehash,
                         basedate,
                         bres,
-=======
                         self.jk.get_base_hash(bid),
                         self.jk.get_base_commitdate(bid),
                         self.jk.get_result(bid),
->>>>>>> Convert Jenkins interface to Jenkins project interface
                         bid
                     )
                 elif pjt == sktm.jtype.PATCHWORK:
                     patches = list()
-<<<<<<< HEAD
-=======
                     bres = self.jk.get_result(bid)
                     rurl = self.jk.get_result_url(id)
                     logging.info("result=%s", bres)
@@ -391,7 +383,6 @@ class watcher(object):
                             sktm.misc.TEST_FAILURE,
                             bid
                         )
->>>>>>> Convert Jenkins interface to Jenkins project interface
 
                     patch_url_list = self.jk.get_patch_url_list(bid)
                     for patch_url in patch_url_list:

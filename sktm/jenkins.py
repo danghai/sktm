@@ -354,6 +354,13 @@ class JenkinsProject(object):
         return build.get_number()
 
     def is_build_complete(self, buildid):
+        """
+        Check if a project build is complete.
+        Args:
+            buildid:    Jenkins build ID to get the status of.
+        Return:
+            True if the build is complete, False if not.
+        """
         job = self.server.get_job(self.name)
         build = job.get_build(buildid)
 
