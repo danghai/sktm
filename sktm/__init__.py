@@ -160,7 +160,7 @@ class watcher(object):
                                     (baseurl, pname))
                 pw.since = since
         else:
-            pw = sktm.patchwork.skt_patchwork(
+            pw = sktm.patchwork.PatchworkV1Project(
                 baseurl, pname, int(lpatch) if lpatch else None, skip
             )
 

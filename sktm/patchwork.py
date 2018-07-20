@@ -819,7 +819,7 @@ class PatchworkV2Project(PatchworkProject):
         return series_list
 
 
-class skt_patchwork(PatchworkProject):
+class PatchworkV1Project(PatchworkProject):
     """
     A Patchwork XML RPC interface
     """
@@ -851,7 +851,7 @@ class skt_patchwork(PatchworkProject):
         # A dictionary of series cover letter patch objects identified by
         # "series IDs", the same ones used in "series' above.
         self.covers = dict()
-        super(skt_patchwork, self).__init__(
+        super(PatchworkV1Project, self).__init__(
             baseurl,
             projectname,
             skip,
