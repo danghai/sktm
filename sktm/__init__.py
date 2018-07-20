@@ -44,7 +44,7 @@ def join_with_slash(base, *suffix):
     return '/'.join(parts) + ending
 
 
-class jtype(enum.IntEnum):
+class JobType(enum.IntEnum):
     """Job type"""
     BASELINE = 0
     PATCHWORK = 1
@@ -81,7 +81,7 @@ class watcher(object):
         self.makeopts = makeopts
         # List of pending Jenkins builds, each one represented by a 3-tuple
         # containing:
-        # * Build type (jtype)
+        # * Build type (JobType)
         # * Build number
         # * Patchwork interface to get details of the tested patch from
         self.pj = list()
@@ -181,7 +181,7 @@ class watcher(object):
     # FIXME Fix the name, this function doesn't check anything by itself
     def check_baseline(self):
         """Submit a build for baseline"""
-        self.pj.append((sktm.jtype.BASELINE,
+        self.pj.append((sktm.JobType.BASELINE,
                         self.jk.build(baserepo=self.baserepo,
                                       ref=self.baseref,
                                       baseconfig=self.cfgurl,
@@ -313,7 +313,7 @@ class watcher(object):
                                              series.get_patch_info_list())
                 # Submit and remember a Jenkins build for the series
                 url_list = series.get_patch_url_list()
-                self.pj.append((sktm.jtype.PATCHWORK,
+                self.pj.append((sktm.JobType.PATCHWORK,
                                 self.jk.build(
                                     baserepo=self.baserepo,
                                     ref=stablecommit,
@@ -346,7 +346,7 @@ class watcher(object):
                     logging.warning("job completed with an error, ignoring")
                     continue
 
-                if pjt == sktm.jtype.BASELINE:
+                if pjt == sktm.JobType.BASELINE:
                     self.db.update_baseline(
                         self.baserepo,
                         basehash,
@@ -354,7 +354,7 @@ class watcher(object):
                         bres,
                         bid
                     )
-                elif pjt == sktm.jtype.PATCHWORK:
+                elif pjt == sktm.JobType.PATCHWORK:
                     patches = list()
 
                     patch_url_list = self.jk.get_patch_url_list(bid)
