@@ -24,7 +24,6 @@ import sktm.db
 import sktm.jenkins
 import sktm.misc
 import sktm.patchwork
-import sktm.jenkins
 
 
 def join_with_slash(base, *suffix):
