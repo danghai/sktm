@@ -143,7 +143,7 @@ class watcher(object):
                             names, case insensitive.
         """
         if self.restapi:
-            pw = sktm.patchwork.skt_patchwork2(
+            pw = sktm.patchwork.PatchworkV2Project(
                 baseurl, pname, lpatch, apikey, skip
             )
 

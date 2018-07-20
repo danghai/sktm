@@ -419,7 +419,7 @@ class PatchworkProject(object):
         return "mbox"
 
 
-class skt_patchwork2(PatchworkProject):
+class PatchworkV2Project(PatchworkProject):
     """
     A Patchwork REST interface
     """
@@ -445,7 +445,7 @@ class skt_patchwork2(PatchworkProject):
         self.apikey = apikey
         # JSON representation of API URLs retrieved from the Patchwork server
         self.apiurls = self.__get_apiurls(baseurl)
-        super(skt_patchwork2, self).__init__(baseurl, projectname, skip)
+        super(PatchworkV2Project, self).__init__(baseurl, projectname, skip)
 
     def _get_project_id(self, project_name):
         """
