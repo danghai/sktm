@@ -179,6 +179,16 @@ def cmd_report(cfg):
 
 
 def load_config(args):
+    """
+    Load sktm configuration from the command line and the configuration file.
+
+    Args:
+        args:   Parsed command-line configuration, including the path to the
+                configuration file.
+
+    Returns:
+        Loaded configuration dictionary.
+    """
     config = ConfigParser.ConfigParser()
     config.read(os.path.expanduser(args.rc))
     cfg = vars(args)
