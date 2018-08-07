@@ -42,19 +42,54 @@ def setup_parser():
     """
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-v", "--verbose", help="Increase verbosity level",
-                        action="count", default=0)
-    parser.add_argument("--rc", help="Path to rc file", default="~/.sktmrc")
-    parser.add_argument("--db", help="Path to db file", default="~/.sktm.db")
-    parser.add_argument("--jurl", help="Jenkins URL")
-    parser.add_argument("--jlogin", help="Jenkins login")
-    parser.add_argument("--jpass", help="Jenkins password")
-    parser.add_argument("--jretry", type=int,
-                        help="Counter to retry Jenkins, default to %d" %
-                        DEFAULT_JENKINS_RETRY_COUNT)
-    parser.add_argument("--jjname", help="Jenkins job name")
-    parser.add_argument("--makeopts", help="Specify options for make")
-    parser.add_argument("--cfgurl", type=str, help="Kernel config URL")
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        help="Increase verbosity level",
+        action="count",
+        default=0
+    )
+    parser.add_argument(
+        "--rc",
+        help="Path to rc file",
+        default="~/.sktmrc"
+    )
+    parser.add_argument(
+        "--db",
+        help="Path to db file",
+        default="~/.sktm.db"
+    )
+    parser.add_argument(
+        "--jurl",
+        help="Jenkins URL"
+    )
+    parser.add_argument(
+        "--jlogin",
+        help="Jenkins login"
+    )
+    parser.add_argument(
+        "--jpass",
+        help="Jenkins password"
+    )
+    parser.add_argument(
+        "--jretry",
+        type=int,
+        help="Counter to retry Jenkins, default to %d" %
+        DEFAULT_JENKINS_RETRY_COUNT
+    )
+    parser.add_argument(
+        "--jjname",
+        help="Jenkins job name"
+    )
+    parser.add_argument(
+        "--makeopts",
+        help="Specify options for make"
+    )
+    parser.add_argument(
+        "--cfgurl",
+        type=str,
+        help="Kernel config URL"
+    )
 
     # Reporting-related arguments
     parser.add_argument(
@@ -98,25 +133,61 @@ def setup_parser():
     subparsers = parser.add_subparsers()
 
     parser_baseline = subparsers.add_parser("baseline")
-    parser_baseline.add_argument("repo", type=str, help="Base repo URL")
-    parser_baseline.add_argument("ref", type=str, help="Base repo ref to test")
+    parser_baseline.add_argument(
+        "repo",
+        type=str,
+        help="Base repo URL"
+    )
+    parser_baseline.add_argument(
+        "ref",
+        type=str,
+        help="Base repo ref to test"
+    )
     parser_baseline.set_defaults(func=cmd_baseline)
 
     parser_patchwork = subparsers.add_parser("patchwork")
-    parser_patchwork.add_argument("repo", type=str, help="Base repo URL")
-    parser_patchwork.add_argument("baseurl", type=str, help="Base URL")
-    parser_patchwork.add_argument("project", type=str, help="Project name")
-    parser_patchwork.add_argument("--lastpatch", type=str, help="Last patch "
-                                  "(id for pw1; datetime for pw2)")
-    parser_patchwork.add_argument("--restapi", help="Use REST API",
-                                  action="store_true", default=False)
-    parser_patchwork.add_argument("--apikey", type=str,
-                                  help="API key to write down results")
-    parser_patchwork.add_argument("--filter", type=str,
-                                  help="Patchset filter program")
-    parser_patchwork.add_argument('--skip', nargs='+', default=[],
-                                  help='Patterns of patch names which should '
-                                  'be skipped for testing, case insensitive')
+    parser_patchwork.add_argument(
+        "repo",
+        type=str,
+        help="Base repo URL"
+    )
+    parser_patchwork.add_argument(
+        "baseurl",
+        type=str,
+        help="Base URL"
+    )
+    parser_patchwork.add_argument(
+        "project",
+        type=str,
+        help="Project name"
+    )
+    parser_patchwork.add_argument(
+        "--lastpatch",
+        type=str,
+        help="Last patch (id for pw1; datetime for pw2)")
+    parser_patchwork.add_argument(
+        "--restapi",
+        help="Use REST API",
+        action="store_true",
+        default=False
+    )
+    parser_patchwork.add_argument(
+        "--apikey",
+        type=str,
+        help="API key to write down results"
+    )
+    parser_patchwork.add_argument(
+        "--filter",
+        type=str,
+        help="Patchset filter program"
+    )
+    parser_patchwork.add_argument(
+        '--skip',
+        nargs='+',
+        default=[],
+        help='Patterns of patch names which should be skipped for testing, '
+        'case insensitive'
+    )
     parser_patchwork.set_defaults(func=cmd_patchwork)
 
     parser_testinfo = subparsers.add_parser("testinfo")
@@ -124,9 +195,11 @@ def setup_parser():
 
     # Standalone reporting of already finished testing
     parser_report = subparsers.add_parser('report')
-    parser_report.add_argument('--assets',
-                               type=str,
-                               help='Directory of assets to report.')
+    parser_report.add_argument(
+        '--assets',
+        type=str,
+        help='Directory of assets to report.'
+    )
     parser_report.set_defaults(func=cmd_report)
 
     return parser
