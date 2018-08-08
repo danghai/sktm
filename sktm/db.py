@@ -17,7 +17,8 @@ import logging
 import os
 import sqlite3
 import time
-import sktm.misc
+
+from sktm.misc import TestResult
 
 
 class SktDb(object):
@@ -321,7 +322,7 @@ class SktDb(object):
         if not result:
             return None
 
-        return sktm.misc.TestResult(result[0])
+        return TestResult(result[0])
 
     def get_stable(self, baserepo):
         """Get the latest stable commit ID for a baseline Git repo URL.
@@ -434,8 +435,8 @@ class SktDb(object):
             baserepo:   Baseline Git repo URL.
             commithash: Commit SHA of the baseline commit.
             commitdate: Date of the commit.
-            result:     Result ID of the test run (an sktm.misc.TestResult).
-                        Cannot be sktm.misc.TestResult.ERROR.
+            result:     Result ID of the test run (a TestResult). Cannot be
+                        TestResult.ERROR.
             build_id:   The build ID of the test run.
 
         """
@@ -550,7 +551,7 @@ class SktDb(object):
         for (burl, commit, res, buildid) in self.cur.fetchall():
             print("repo url:", burl)
             print("commit id:", commit)
-            print("result:", sktm.misc.TestResult(res).name)
+            print("result:", TestResult(res).name)
             print("build id: #", buildid, sep='')
             print("---")
 

@@ -18,7 +18,8 @@ import time
 
 import jenkinsapi
 
-import sktm.misc
+import sktm
+from sktm.misc import TestResult
 
 
 class JenkinsProject(object):
@@ -320,7 +321,7 @@ class JenkinsProject(object):
 
     def get_result(self, buildid):
         """
-        Get result code (sktm.misc.TestResult) for the specified build of the
+        Get result code (TestResult) for the specified build of the
         specified Jenkins project. Wait for the build to complete, if it
         hasn't yet.
 
@@ -328,7 +329,7 @@ class JenkinsProject(object):
             buildid:    Jenkins build ID.
 
         Return:
-            The build result code (sktm.misc.TestResult).
+            The build result code (TestResult).
         """
         build = self._wait_and_get_build(buildid)
 
@@ -336,13 +337,13 @@ class JenkinsProject(object):
         logging.info("build_status=%s", bstatus)
 
         if bstatus == "SUCCESS":
-            return sktm.misc.TestResult.SUCCESS
+            return TestResult.SUCCESS
         elif bstatus == "UNSTABLE":
             # Find earliest (worst) step failure
             step_failure_result_list = [
-                ("skt.cmd_merge", sktm.misc.TestResult.MERGE_FAILURE),
-                ("skt.cmd_build", sktm.misc.TestResult.BUILD_FAILURE),
-                ("skt.cmd_run", sktm.misc.TestResult.TEST_FAILURE),
+                ("skt.cmd_merge", TestResult.MERGE_FAILURE),
+                ("skt.cmd_build", TestResult.BUILD_FAILURE),
+                ("skt.cmd_run", TestResult.TEST_FAILURE),
             ]
             for (step, failure_result) in step_failure_result_list:
                 if set(self.__get_data_list(buildid, step, "status")) & \
@@ -353,7 +354,7 @@ class JenkinsProject(object):
                             bstatus)
         else:
             logging.warning("Reporting build status \"%s\" as error", bstatus)
-        return sktm.misc.TestResult.ERROR
+        return TestResult.ERROR
 
     # FIXME Clarify/fix argument names
     def build(self, baserepo=None, ref=None, baseconfig=None,

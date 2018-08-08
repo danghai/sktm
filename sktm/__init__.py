@@ -22,7 +22,7 @@ import enum
 
 import sktm.db
 import sktm.jenkins
-import sktm.misc
+from sktm.misc import TestResult
 import sktm.patchwork
 
 
@@ -343,7 +343,7 @@ class watcher(object):
                              pjt, bid, bres.name, rurl)
                 self.pj.remove((pjt, bid, cpw))
 
-                if bres == sktm.misc.TestResult.ERROR:
+                if bres == TestResult.ERROR:
                     logging.warning("job completed with an error, ignoring")
                     continue
 
