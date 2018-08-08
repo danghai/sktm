@@ -18,8 +18,7 @@ import time
 
 import jenkinsapi
 
-import sktm
-from sktm.misc import TestResult
+from sktm.misc import TestResult, join_with_slash
 
 
 class JenkinsProject(object):
@@ -315,9 +314,9 @@ class JenkinsProject(object):
         Result:
             The URL of the build result.
         """
-        return sktm.join_with_slash(self.server.base_server_url(),
-                                    "job",
-                                    str(buildid))
+        return join_with_slash(self.server.base_server_url(),
+                               "job",
+                               str(buildid))
 
     def get_result(self, buildid):
         """

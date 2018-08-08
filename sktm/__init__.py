@@ -26,24 +26,6 @@ from sktm.misc import TestResult
 import sktm.patchwork
 
 
-def join_with_slash(base, *suffix):
-    """
-    Join parts of URL or path by slashes
-
-    Args:
-        base:    Base URL or path.
-        *suffix: Array of suffixes
-
-    Returns:
-           The URL or path string
-    """
-    parts = [base.rstrip('/')]
-    for arg in suffix:
-        parts.append(arg.strip('/'))
-    ending = '/' if arg.endswith('/') else ''
-    return '/'.join(parts) + ending
-
-
 class JobType(enum.IntEnum):
     """Job type"""
     BASELINE = 0

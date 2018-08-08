@@ -19,7 +19,7 @@ import os
 import re
 import smtplib
 
-from sktm import join_with_slash
+from sktm.misc import join_with_slash
 
 
 SUBSTITUTE_RE = re.compile(r'\{[\w\.]+\}')

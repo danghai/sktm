@@ -25,8 +25,7 @@ import xmlrpclib
 import dateutil.parser
 import requests
 
-import sktm
-from sktm.misc import TestResult
+from sktm.misc import TestResult, join_with_slash
 
 
 SKIP_PATTERNS = [
@@ -86,7 +85,7 @@ class ObjectSummary(object):
         Returns:
             URL pointing at the object's mbox.
         """
-        return sktm.join_with_slash(self.url, self.mbox_sfx)
+        return join_with_slash(self.url, self.mbox_sfx)
 
 
 class SeriesSummary(object):
@@ -309,10 +308,10 @@ class PatchworkProject(object):
             of requests exceptions, Exception in case of unexpected return code
             (eg. nonexistent patch).
         """
-        mbox_url = sktm.join_with_slash(self.baseurl,
-                                        'patch',
-                                        str(patch_id),
-                                        self._get_mbox_url_sfx())
+        mbox_url = join_with_slash(self.baseurl,
+                                   'patch',
+                                   str(patch_id),
+                                   self._get_mbox_url_sfx())
 
         try:
             response = requests.get(mbox_url)
@@ -402,9 +401,9 @@ class PatchworkProject(object):
         Returns:
             Patch URL.
         """
-        return sktm.join_with_slash(self.baseurl,
-                                    'patch',
-                                    str(patch.get('id')))
+        return join_with_slash(self.baseurl,
+                               'patch',
+                               str(patch.get('id')))
 
     def _get_mbox_url_sfx(self):
         """
@@ -458,10 +457,8 @@ class PatchworkV2Project(PatchworkProject):
         Returns:
             Integer representing project's ID.
         """
-        response = requests.get(
-            sktm.join_with_slash(self.apiurls.get("projects"),
-                                 project_name)
-        )
+        response = requests.get(join_with_slash(self.apiurls.get("projects"),
+                                                project_name))
         if response.status_code != requests.codes.ok:
             raise Exception("Can't get project data: %s %d" %
                             (project_name, response.status_code))
@@ -475,7 +472,7 @@ class PatchworkV2Project(PatchworkProject):
         Returns:
             The JSON representation of the API URLs.
         """
-        response = requests.get(sktm.join_with_slash(baseurl, "api"))
+        response = requests.get(join_with_slash(baseurl, "api"))
         if response.status_code != 200:
             raise Exception("Can't get apiurls: %d" % response.status_code)
 
@@ -696,10 +693,8 @@ class PatchworkV2Project(PatchworkProject):
             set of supported attributes depends on which API versions are
             supported by a specific Patchwork instance.
         """
-        response = requests.get(
-            sktm.join_with_slash(self.apiurls.get("patches"),
-                                 str(pid))
-        )
+        response = requests.get(join_with_slash(self.apiurls.get("patches"),
+                                                str(pid)))
 
         if response.status_code != 200:
             raise Exception("Can't get patch by id %d (%d)" %
@@ -745,8 +740,7 @@ class PatchworkV2Project(PatchworkProject):
                     continue
                 else:
                     series_list += self.__get_series_from_url(
-                        sktm.join_with_slash(self.apiurls.get("series"),
-                                             str(sid))
+                        join_with_slash(self.apiurls.get("series"), str(sid))
                     )
                     seen.add(sid)
 
@@ -811,8 +805,8 @@ class PatchworkV2Project(PatchworkProject):
                     sid = series.get("id")
                     if sid not in seen:
                         series_list += self.__get_series_from_url(
-                            sktm.join_with_slash(self.apiurls.get("series"),
-                                                 str(sid))
+                            join_with_slash(self.apiurls.get("series"),
+                                            str(sid))
                         )
                         seen.add(sid)
 
@@ -870,7 +864,7 @@ class PatchworkV1Project(PatchworkProject):
         Returns:
             The XML RPC interface for the Patchwork
         """
-        rpc = xmlrpclib.ServerProxy(sktm.join_with_slash(baseurl, "xmlrpc/"))
+        rpc = xmlrpclib.ServerProxy(join_with_slash(baseurl, "xmlrpc/"))
         try:
             ver = rpc.pw_rpc_version()
             # check for normal patchwork1 xmlrpc version numbers

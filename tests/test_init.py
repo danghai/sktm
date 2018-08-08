@@ -21,38 +21,6 @@ from mock import Mock
 import sktm
 
 
-class TestIndependent(unittest.TestCase):
-    """Test cases for independent functions in __init__.py."""
-
-    def test_join_with_slash(self):
-        """Ensure join_with_slash return a good url, path string."""
-        base = "path/to/dir"
-        suffix = "file"
-        self.assertEqual("path/to/dir/file",
-                         sktm.join_with_slash(base, suffix))
-        base = "path/to/dir/"
-        suffix = "file"
-        self.assertEqual("path/to/dir/file",
-                         sktm.join_with_slash(base, suffix))
-        base = "path/to/dir1/"
-        suffix = "dir2/"
-        self.assertEqual("path/to/dir1/dir2/",
-                         sktm.join_with_slash(base, suffix))
-        base = "path/to/dir1/"
-        suffix1 = "dir2/"
-        suffix2 = "file"
-        self.assertEqual("path/to/dir1/dir2/file",
-                         sktm.join_with_slash(base, suffix1, suffix2))
-        base = "http://url.com/"
-        suffix = "part"
-        self.assertEqual("http://url.com/part",
-                         sktm.join_with_slash(base, suffix))
-        base = "http://url.com"
-        suffix = "part"
-        self.assertEqual("http://url.com/part",
-                         sktm.join_with_slash(base, suffix))
-
-
 class TestInit(unittest.TestCase):
     """Test cases for the __init__ module."""
 
