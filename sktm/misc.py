@@ -24,6 +24,12 @@ class TestResult(enum.IntEnum):
     TEST_FAILURE = 4
 
 
+class JobType(enum.IntEnum):
+    """Job type"""
+    BASELINE = 0
+    PATCHWORK = 1
+
+
 def join_with_slash(base, *suffix_tuple):
     """
     Join parts of URL or path by slashes. Trailing slash of base, and each

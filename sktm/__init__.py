@@ -18,18 +18,10 @@ import re
 import subprocess
 import time
 
-import enum
-
 import sktm.db
 import sktm.jenkins
-from sktm.misc import TestResult
+from sktm.misc import TestResult, JobType
 import sktm.patchwork
-
-
-class JobType(enum.IntEnum):
-    """Job type"""
-    BASELINE = 0
-    PATCHWORK = 1
 
 
 # TODO This is no longer just a watcher. Rename/refactor/describe accordingly.
@@ -163,7 +155,7 @@ class watcher(object):
     # FIXME Fix the name, this function doesn't check anything by itself
     def check_baseline(self):
         """Submit a build for baseline"""
-        self.pj.append((sktm.JobType.BASELINE,
+        self.pj.append((JobType.BASELINE,
                         self.jk.build(baserepo=self.baserepo,
                                       ref=self.baseref,
                                       baseconfig=self.cfgurl,
@@ -292,7 +284,7 @@ class watcher(object):
             for series in series_list:
                 # Submit and remember a Jenkins build for the series
                 url_list = series.get_patch_url_list()
-                self.pj.append((sktm.JobType.PATCHWORK,
+                self.pj.append((JobType.PATCHWORK,
                                 self.jk.build(
                                     baserepo=self.baserepo,
                                     ref=stablecommit,
@@ -329,7 +321,7 @@ class watcher(object):
                     logging.warning("job completed with an error, ignoring")
                     continue
 
-                if pjt == sktm.JobType.BASELINE:
+                if pjt == JobType.BASELINE:
                     self.db.update_baseline(
                         self.baserepo,
                         basehash,
@@ -337,7 +329,7 @@ class watcher(object):
                         bres,
                         bid
                     )
-                elif pjt == sktm.JobType.PATCHWORK:
+                elif pjt == JobType.PATCHWORK:
                     patches = list()
 
                     patch_url_list = self.jk.get_patch_url_list(bid)
